@@ -3,7 +3,7 @@ import axios from "axios";
 // dotenv.config();
 
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.BASE_URL_SERVER || "http://localhost:5000/api",
+  baseURL: import.meta.env.VITE_BASE_URL_SERVER || "http://localhost:5000/api",
   withCredentials: true, // send cookies to the server
 });
 
