@@ -6,6 +6,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
+ARG VITE_BASE_URL_SERVER
 RUN npm run build
  
 # Production Stage
