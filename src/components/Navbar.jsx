@@ -12,15 +12,12 @@ import { useUserStore } from "../stores/useUserStore";
 import { useState } from "react";
 
 const Navbar = () => {
-  const { 
-    user, 
-    logout 
-  } = useUserStore();
+  const { user, logout } = useUserStore();
   // const user = false;aaa
   // const user = true;
   // const isAdmin = user?.role === "admin";
   const [isOpen, setIsOpen] = useState(false);
-  
+
   const handleLinkClick = () => {
     // Closes the mobile menu when a link is clicked
     setIsOpen(false);

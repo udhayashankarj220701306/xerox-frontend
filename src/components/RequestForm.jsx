@@ -1,14 +1,12 @@
 import { useState } from "react";
 import { useRequestStore } from "../stores/useRequestStore.js";
 import { useUserStore } from "../stores/useUserStore.js";
-import { Link } from "react-router-dom"; // Add this if you need to navigate
 
-// Initial state for a single file configuration
 const createInitialFileState = () => ({
   file: null,
   color: false,
   paper: "A4",
-  layout: "potrait",
+  layout: "portrait",
   pages: [{ start: "", stop: "" }],
   binding: false,
   bindingtype: "soft",
@@ -20,19 +18,15 @@ export const RequestForm = ({ handleRequestForm, requestingProfile }) => {
   const { createRequest, fetchActiveRequests, loading } = useRequestStore();
   const [fileConfig, setFileConfig] = useState([createInitialFileState()]);
 
-  // Make sure requestingProfile is available and not null
   if (!requestingProfile) {
     return (
-      <div className="m-2 p-4 text-center border-2 border-dashed border-red-400 rounded-lg">
+      <div className="m-4 p-6 text-center border-2 border-dashed border-red-400 rounded-xl bg-red-50 text-red-700 font-semibold">
         Xerox profile not found.
       </div>
     );
   }
 
-  // Helper function to check if an option is available
-  const isOptionAvailable = (option, optionArray) => {
-    return optionArray.includes(option);
-  };
+  const isOptionAvailable = (option, optionArray) => optionArray.includes(option);
 
   const handleFileChange = (e, index) => {
     const newFileConfig = [...fileConfig];
@@ -42,9 +36,7 @@ export const RequestForm = ({ handleRequestForm, requestingProfile }) => {
 
   const handlePagesChange = (e, fileIndex, pageIndex, field) => {
     const newFileConfig = [...fileConfig];
-    const newPages = [...newFileConfig[fileIndex].pages];
-    newPages[pageIndex][field] = e.target.value;
-    newFileConfig[fileIndex].pages = newPages;
+    newFileConfig[fileIndex].pages[pageIndex][field] = e.target.value;
     setFileConfig(newFileConfig);
   };
 
@@ -55,27 +47,16 @@ export const RequestForm = ({ handleRequestForm, requestingProfile }) => {
     setFileConfig(newFileConfig);
   };
 
-  const handleAddFile = () => {
-    setFileConfig([...fileConfig, createInitialFileState()]);
-  };
-
-  const handleRemoveFile = (index) => {
-    const newFileConfig = fileConfig.filter((_, i) => i !== index);
-    setFileConfig(newFileConfig);
-  };
-
+  const handleAddFile = () => setFileConfig([...fileConfig, createInitialFileState()]);
+  const handleRemoveFile = (index) => setFileConfig(fileConfig.filter((_, i) => i !== index));
   const handleAddPage = (fileIndex) => {
     const newFileConfig = [...fileConfig];
     newFileConfig[fileIndex].pages.push({ start: "", stop: "" });
     setFileConfig(newFileConfig);
   };
-
   const handleRemovePage = (fileIndex, pageIndex) => {
     const newFileConfig = [...fileConfig];
-    const newPages = newFileConfig[fileIndex].pages.filter(
-      (_, i) => i !== pageIndex
-    );
-    newFileConfig[fileIndex].pages = newPages;
+    newFileConfig[fileIndex].pages = newFileConfig[fileIndex].pages.filter((_, i) => i !== pageIndex);
     setFileConfig(newFileConfig);
   };
 
@@ -83,13 +64,10 @@ export const RequestForm = ({ handleRequestForm, requestingProfile }) => {
     e.preventDefault();
     const formData = new FormData();
     formData.append("userId", user._id);
-    formData.append("xeroxId", requestingProfile.xeroxId); // Use the correct ID from the profile
+    formData.append("xeroxId", requestingProfile.xeroxId);
 
     fileConfig.forEach((fileItem, index) => {
-      if (fileItem.file) {
-        formData.append(`blobFiles`, fileItem.file);
-      }
-      // Use the new formData structure for non-file data
+      if (fileItem.file) formData.append(`blobFiles`, fileItem.file);
       formData.append(`files[${index}][color]`, fileItem.color);
       formData.append(`files[${index}][paper]`, fileItem.paper);
       formData.append(`files[${index}][layout]`, fileItem.layout);
@@ -98,14 +76,8 @@ export const RequestForm = ({ handleRequestForm, requestingProfile }) => {
       formData.append(`files[${index}][sides]`, fileItem.sides);
 
       fileItem.pages.forEach((page, pageIndex) => {
-        formData.append(
-          `files[${index}][pages][${pageIndex}][start]`,
-          page.start
-        );
-        formData.append(
-          `files[${index}][pages][${pageIndex}][stop]`,
-          page.stop
-        );
+        formData.append(`files[${index}][pages][${pageIndex}][start]`, page.start);
+        formData.append(`files[${index}][pages][${pageIndex}][stop]`, page.stop);
       });
     });
 
@@ -115,37 +87,38 @@ export const RequestForm = ({ handleRequestForm, requestingProfile }) => {
   };
 
   return (
-    <div className="m-2 p-2 border-2 border-emerald-400 rounded-lg border-dashed">
-      <h2 className="text-xl font-semibold text-center text-emerald-600 mb-4">
-        Add a New Xerox Request
-      </h2>
+    <div className="m-4 p-6 bg-white rounded-2xl shadow-lg border border-gray-200">
+      <h2 className="text-2xl font-bold text-center text-emerald-600 mb-6">Add a New Xerox Request</h2>
       <form onSubmit={handleSubmit} className="space-y-6">
         {fileConfig.map((fileItem, fileIndex) => (
-          <div
-            key={fileIndex}
-            className="p-4 border border-gray-300 rounded-md"
-          >
-            <h3 className="text-lg font-medium mb-2">File {fileIndex + 1}</h3>
-            {/* ... other file input and page logic ... */}
+          <div key={fileIndex} className="p-5 border border-gray-300 rounded-xl bg-gray-50 shadow-sm">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-800">File {fileIndex + 1}</h3>
+              <button
+                type="button"
+                onClick={() => handleRemoveFile(fileIndex)}
+                className="text-red-500 hover:text-red-700 font-semibold"
+              >
+                Remove File
+              </button>
+            </div>
+
+            {/* File Upload */}
             <div className="mb-4">
-              <label className="block text-gray-700 font-bold mb-2">
-                Upload File
-              </label>
+              <label className="block text-gray-700 font-medium mb-2">Upload File</label>
               <input
                 type="file"
                 name="file"
                 onChange={(e) => handleFileChange(e, fileIndex)}
-                className="block w-full text-sm text-gray-500
-                file:mr-4 file:py-2 file:px-4
-                file:rounded-full file:border-0
-                file:text-sm file:font-semibold
-                file:bg-emerald-50 file:text-emerald-700
-                hover:file:bg-emerald-100"
+                className="block w-full text-sm text-gray-700
+                  file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0
+                  file:text-sm file:font-semibold file:bg-emerald-100 file:text-emerald-700
+                  hover:file:bg-emerald-200"
               />
             </div>
 
             <div className="flex flex-col gap-4">
-              {/* Conditional rendering for color option */}
+              {/* Color */}
               {isOptionAvailable("color", requestingProfile.colorOption) && (
                 <label className="flex items-center space-x-2">
                   <input
@@ -155,18 +128,19 @@ export const RequestForm = ({ handleRequestForm, requestingProfile }) => {
                     onChange={(e) => handleInputChange(e, fileIndex)}
                     className="form-checkbox h-5 w-5 text-emerald-600"
                   />
-                  <span>Color Print</span>
+                  <span className="text-gray-800 font-medium">Color Print</span>
                 </label>
               )}
-              {/* Conditional rendering for paper option */}
+
+              {/* Paper */}
               {requestingProfile.paperOption.length > 0 && (
                 <label className="block">
-                  <span>Paper Size:</span>
+                  <span className="font-medium text-gray-800">Paper Size:</span>
                   <select
                     name="paper"
                     value={fileItem.paper}
                     onChange={(e) => handleInputChange(e, fileIndex)}
-                    className="mt-1 block w-full rounded-md bg-gray-600 border-gray-300 shadow-sm"
+                    className="mt-1 block w-full rounded-md border border-gray-300 bg-white text-gray-900 px-3 py-2 shadow-sm focus:ring-emerald-400 focus:border-emerald-400 outline-none"
                   >
                     {requestingProfile.paperOption.map((option) => (
                       <option key={option} value={option}>
@@ -176,15 +150,16 @@ export const RequestForm = ({ handleRequestForm, requestingProfile }) => {
                   </select>
                 </label>
               )}
-              {/* Conditional rendering for layout option */}
+
+              {/* Layout */}
               {requestingProfile.layoutOption.length > 0 && (
                 <label className="block">
-                  <span>Layout:</span>
+                  <span className="font-medium text-gray-800">Layout:</span>
                   <select
                     name="layout"
                     value={fileItem.layout}
                     onChange={(e) => handleInputChange(e, fileIndex)}
-                    className="mt-1 block w-full rounded-md bg-gray-600 border-gray-300 shadow-sm"
+                    className="mt-1 block w-full rounded-md border border-gray-300 bg-white text-gray-900 px-3 py-2 shadow-sm focus:ring-emerald-400 focus:border-emerald-400 outline-none"
                   >
                     {requestingProfile.layoutOption.map((option) => (
                       <option key={option} value={option}>
@@ -196,36 +171,32 @@ export const RequestForm = ({ handleRequestForm, requestingProfile }) => {
               )}
 
               {/* Pages */}
-              <div className="border p-2 rounded-md">
-                <h4 className="font-semibold mb-2">Pages to Print</h4>
+              <div className="border p-3 rounded-lg bg-white shadow-sm">
+                <h4 className="font-semibold mb-2 text-gray-800">Pages to Print</h4>
                 {fileItem.pages.map((page, pageIndex) => (
-                  <div key={pageIndex} className="flex gap-2 mb-2">
-                    <label>
-                      Start:
+                  <div key={pageIndex} className="flex gap-3 mb-2 items-center">
+                    <label className="flex flex-col">
+                      <span className="text-gray-600 text-sm">Start</span>
                       <input
                         type="number"
                         value={page.start}
-                        onChange={(e) =>
-                          handlePagesChange(e, fileIndex, pageIndex, "start")
-                        }
-                        className="w-16 ml-1 rounded-md bg-gray-600 border-gray-300"
+                        onChange={(e) => handlePagesChange(e, fileIndex, pageIndex, "start")}
+                        className="w-20 rounded-md border border-gray-300 bg-white text-gray-900 px-3 py-2 shadow-sm focus:ring-emerald-400 focus:border-emerald-400 outline-none"
                       />
                     </label>
-                    <label>
-                      Stop:
+                    <label className="flex flex-col">
+                      <span className="text-gray-600 text-sm">Stop</span>
                       <input
                         type="number"
                         value={page.stop}
-                        onChange={(e) =>
-                          handlePagesChange(e, fileIndex, pageIndex, "stop")
-                        }
-                        className="w-16 ml-1 rounded-md bg-gray-600 border-gray-300"
+                        onChange={(e) => handlePagesChange(e, fileIndex, pageIndex, "stop")}
+                        className="w-20 rounded-md border border-gray-300 bg-white text-gray-900 px-3 py-2 shadow-sm focus:ring-emerald-400 focus:border-emerald-400 outline-none"
                       />
                     </label>
                     <button
                       type="button"
                       onClick={() => handleRemovePage(fileIndex, pageIndex)}
-                      className="text-red-500 hover:text-red-700"
+                      className="text-red-500 hover:text-red-700 font-semibold text-sm"
                     >
                       Remove
                     </button>
@@ -234,14 +205,15 @@ export const RequestForm = ({ handleRequestForm, requestingProfile }) => {
                 <button
                   type="button"
                   onClick={() => handleAddPage(fileIndex)}
-                  className="mt-2 text-sm text-blue-500 hover:text-blue-700"
+                  className="mt-2 text-sm text-blue-500 hover:text-blue-700 font-medium"
                 >
                   + Add Page Range
                 </button>
               </div>
-              {/* Conditional rendering for binding option */}
+
+              {/* Binding */}
               {requestingProfile.bindingOption.length > 0 && (
-                <label className="flex items-center space-x-2">
+                <label className="flex items-center space-x-2 mt-2">
                   <input
                     type="checkbox"
                     name="binding"
@@ -249,36 +221,37 @@ export const RequestForm = ({ handleRequestForm, requestingProfile }) => {
                     onChange={(e) => handleInputChange(e, fileIndex)}
                     className="form-checkbox h-5 w-5 text-emerald-600"
                   />
-                  <span>Binding</span>
+                  <span className="text-gray-800 font-medium">Binding</span>
                 </label>
               )}
-              {fileItem.binding &&
-                requestingProfile.bindingOption.length > 0 && (
-                  <label className="block">
-                    <span>Binding Type:</span>
-                    <select
-                      name="bindingtype"
-                      value={fileItem.bindingtype}
-                      onChange={(e) => handleInputChange(e, fileIndex)}
-                      className="mt-1 block bg-gray-600 w-full rounded-md border-gray-300 shadow-sm"
-                    >
-                      {requestingProfile.bindingOption.map((option) => (
-                        <option key={option} value={option}>
-                          {option}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                )}
-              {/* Conditional rendering for sides option */}
+
+              {fileItem.binding && requestingProfile.bindingOption.length > 0 && (
+                <label className="block mt-1">
+                  <span className="font-medium text-gray-800">Binding Type:</span>
+                  <select
+                    name="bindingtype"
+                    value={fileItem.bindingtype}
+                    onChange={(e) => handleInputChange(e, fileIndex)}
+                    className="mt-1 block w-full rounded-md border border-gray-300 bg-white text-gray-900 px-3 py-2 shadow-sm focus:ring-emerald-400 focus:border-emerald-400 outline-none"
+                  >
+                    {requestingProfile.bindingOption.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )}
+
+              {/* Sides */}
               {requestingProfile.sidesOption.length > 0 && (
-                <label className="block">
-                  <span>Sides:</span>
+                <label className="block mt-2">
+                  <span className="font-medium text-gray-800">Sides:</span>
                   <select
                     name="sides"
                     value={fileItem.sides}
                     onChange={(e) => handleInputChange(e, fileIndex)}
-                    className="mt-1 block w-full bg-gray-600 rounded-md border-gray-300 shadow-sm"
+                    className="mt-1 block w-full rounded-md border border-gray-300 bg-white text-gray-900 px-3 py-2 shadow-sm focus:ring-emerald-400 focus:border-emerald-400 outline-none"
                   >
                     {requestingProfile.sidesOption.map((option) => (
                       <option key={option} value={option}>
@@ -289,29 +262,23 @@ export const RequestForm = ({ handleRequestForm, requestingProfile }) => {
                 </label>
               )}
             </div>
-
-            <button
-              type="button"
-              onClick={() => handleRemoveFile(fileIndex)}
-              className="mt-4 w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-md transition duration-300"
-            >
-              Remove File
-            </button>
           </div>
         ))}
-        {/* Add more files button */}
+
+        {/* Add Another File */}
         <button
           type="button"
           onClick={handleAddFile}
-          className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-4 rounded-md transition duration-300"
+          className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-4 rounded-xl transition duration-300"
         >
-          Add Another File
+          + Add Another File
         </button>
+
         {/* Submit Button */}
         <button
           type="submit"
           disabled={loading}
-          className={`w-full py-3 px-6 rounded-md font-bold text-white transition duration-300 ${
+          className={`w-full py-3 px-4 rounded-xl font-bold text-white transition duration-300 ${
             loading ? "bg-gray-400" : "bg-blue-500 hover:bg-blue-600"
           }`}
         >

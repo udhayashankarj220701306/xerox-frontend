@@ -26,6 +26,7 @@ function App() {
       <Navbar className="mb-20" />
       <Routes>
         <Route path="/" element={<HomePage />} />
+        
         <Route
           path="/signup"
           element={!user ? <SignUpPage /> : <Navigate to="/" />}
@@ -41,6 +42,7 @@ function App() {
         />
         <Route path="/xerox" element={user ? <XeroxPage /> : <LoginPage />} />
       </Routes>
+      
     </div>
   );
 }
