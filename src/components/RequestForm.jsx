@@ -86,7 +86,7 @@ export const RequestForm = ({ handleRequestForm, requestingProfile }) => {
     e.preventDefault();
     const formData = new FormData();
     formData.append("userId", user._id);
-    formData.append("xeroxId", requestingProfile.xeroxId); 
+    formData.append("xeroxId", requestingProfile.xeroxId._id); 
 
     fileConfig.forEach((fileItem, index) => {
       if (fileItem.file) {
