@@ -6,6 +6,7 @@ export const useUserStore = create((set, get) => ({
 	user: null,
 	loading: false,
 	checkingAuth: true,
+	profile:null,
 
 	signup: async ({ name, email, password, confirmPassword }) => {
 		set({ loading: true });
@@ -50,10 +51,20 @@ export const useUserStore = create((set, get) => ({
 		set({ checkingAuth: true });
 		try {
 			const response = await axios.get("/auth/profile");
+			console.log("checkAuth:", response.data);
 			set({ user: response.data, checkingAuth: false });
 		} catch (error) {
 			console.log(error.message);
 			set({ checkingAuth: false, user: null });
+		}
+	},
+	getProfile:async () => {
+		try {
+			const response = await axios.get("/auth/profile");
+			set({ profile: response.data });
+		} catch (error) {
+			console.log(error.message);
+			return null;
 		}
 	},
 

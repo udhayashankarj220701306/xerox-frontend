@@ -7,6 +7,7 @@ import RequestPage from "./pages/RequestPage.jsx";
 import SignUpPage from "./pages/SignUpPage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import { XeroxPage } from "./pages/XeroxPage.jsx";
+import { ProfilePage } from "./pages/ProfilePage.jsx";
 
 import Navbar from "./components/Navbar.jsx";
 import LoadingSpinner from "./components/LoadingSpinner.jsx";
@@ -34,12 +35,19 @@ function App() {
           path="/login"
           element={!user ? <LoginPage /> : <Navigate to="/" />}
         />
+        <Route
+          path="/profile"
+          element={user ? <ProfilePage /> : <Navigate to="/login" />}
+        />
         {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
         <Route
           path="/request"
-          element={user ? <RequestPage /> : <LoginPage />}
+          element={user ? <RequestPage /> : <Navigate to="/login" />}
         />
-        <Route path="/xerox" element={user ? <XeroxPage /> : <LoginPage />} />
+        <Route
+          path="/xerox"
+          element={user ? <XeroxPage /> : <Navigate to="/login" />}
+        />
       </Routes>
     </div>
   );

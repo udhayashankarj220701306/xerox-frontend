@@ -7,7 +7,7 @@ export const NoCurrentRequest = () => {
     <div>
       <div
         className=" rounded-lg m-2 p-1 flex flex-col justify-center items-center border-2 border-dashed border-gray-600"
-        onClick={() => navigate("/request")}
+        onClick={() => navigate("/xerox")}
       >
         No Current Request
         <AddRequestButton />

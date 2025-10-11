@@ -12,15 +12,13 @@ import { useUserStore } from "../stores/useUserStore";
 import { useState } from "react";
 
 const Navbar = () => {
-  const { 
-    user, 
-    logout 
-  } = useUserStore();
+  const { user, logout } = useUserStore();
   // const user = false;aaa
   // const user = true;
   // const isAdmin = user?.role === "admin";
   const [isOpen, setIsOpen] = useState(false);
-  
+
+  console.log("user in navbar:", user);
   const handleLinkClick = () => {
     // Closes the mobile menu when a link is clicked
     setIsOpen(false);
@@ -66,19 +64,28 @@ const Navbar = () => {
             {user ? (
               // Logged in user links
               <>
-                <Link
-                  to={"/xerox"}
-                  className="text-gray-300 hover:text-emerald-400 transition"
-                  onClick={handleLinkClick}
-                >
-                  Xerox
-                </Link>
+                {user.role === "student" && (
+                  <Link
+                    to={"/xerox"}
+                    className="text-gray-300 hover:text-emerald-400 transition"
+                    onClick={handleLinkClick}
+                  >
+                    Xerox
+                  </Link>
+                )}
                 <Link
                   to={"/request"}
                   className="text-gray-300 hover:text-emerald-400 transition"
                   onClick={handleLinkClick}
                 >
                   Request
+                </Link>
+                <Link
+                  to={"/profile"}
+                  className="text-gray-300 hover:text-emerald-400 transition"
+                  onClick={handleLinkClick}
+                >
+                  Profile
                 </Link>
                 {/* {isAdmin && (
                   <Link

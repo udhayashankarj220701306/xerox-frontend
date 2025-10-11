@@ -6,7 +6,7 @@ const HomePage = () => {
 
 	return (
     <>
-      <div className="relative min-h-screen text-white overflow-hidden">
+      <div className="flex flex-col justify-center py-12 mt-6 sm:px-6 lg:px-8">
         Start here
       </div>
     </>

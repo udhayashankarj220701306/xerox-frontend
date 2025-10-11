@@ -40,7 +40,7 @@ export const XeroxPage = () => {
                 }}
               >
                 <h2 className="text-xl font-semibold mb-2">
-                  Xerox ID: {profile.xeroxId}
+                  Xerox Name: {profile.name}
                 </h2>
                 <div className="mt-4">
                   <h3 className="text-lg font-medium">Options:</h3>

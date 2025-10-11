@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useRequestStore } from "../stores/useRequestStore.js";
 import { useUserStore } from "../stores/useUserStore.js";
-import { Link } from "react-router-dom"; // Add this if you need to navigate
+import { useNavigate } from "react-router-dom";
+
 
 // Initial state for a single file configuration
 const createInitialFileState = () => ({
@@ -19,6 +20,8 @@ export const RequestForm = ({ handleRequestForm, requestingProfile }) => {
   const { user } = useUserStore();
   const { createRequest, fetchActiveRequests, loading } = useRequestStore();
   const [fileConfig, setFileConfig] = useState([createInitialFileState()]);
+  const navigate = useNavigate();
+
 
   // Make sure requestingProfile is available and not null
   if (!requestingProfile) {
@@ -83,13 +86,13 @@ export const RequestForm = ({ handleRequestForm, requestingProfile }) => {
     e.preventDefault();
     const formData = new FormData();
     formData.append("userId", user._id);
-    formData.append("xeroxId", requestingProfile.xeroxId); // Use the correct ID from the profile
+    formData.append("xeroxId", requestingProfile.xeroxId); 
 
     fileConfig.forEach((fileItem, index) => {
       if (fileItem.file) {
         formData.append(`blobFiles`, fileItem.file);
       }
-      // Use the new formData structure for non-file data
+      
       formData.append(`files[${index}][color]`, fileItem.color);
       formData.append(`files[${index}][paper]`, fileItem.paper);
       formData.append(`files[${index}][layout]`, fileItem.layout);
@@ -111,7 +114,7 @@ export const RequestForm = ({ handleRequestForm, requestingProfile }) => {
 
     await createRequest({ requestData: formData });
     fetchActiveRequests({ status: "pending" });
-    handleRequestForm();
+    navigate("/request");
   };
 
   return (
