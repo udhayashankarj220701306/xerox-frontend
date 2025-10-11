@@ -1,7 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { AddRequestButton } from "./AddRequestButton.jsx";
-
+import { useUserStore } from "../stores/useUserStore.js";
 export const NoCurrentRequest = () => {
+  const { user } = useUserStore();
   const navigate = useNavigate();
   return (
     <div>
@@ -10,7 +11,7 @@ export const NoCurrentRequest = () => {
         onClick={() => navigate("/xerox")}
       >
         No Current Request
-        <AddRequestButton />
+        {(user.role==="student"&&<AddRequestButton />)}
       </div>
     </div>
   );
