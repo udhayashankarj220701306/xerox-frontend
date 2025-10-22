@@ -9,7 +9,7 @@ export const ProfilePage = () => {
   const {profile,getProfile} = useUserStore();
   useEffect(() => {
     getProfile();
-    console.log("profilepage:", profile);
+    // console.log("profilepage:", profile);
   }, []);
 
   if (!profile) return <div>Loading...</div>;

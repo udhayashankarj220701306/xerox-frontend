@@ -1,14 +1,21 @@
 import { useEffect, useState } from "react";
 import { useXeroxStore } from "../stores/useXeroxStore.js";
 import { RequestForm } from "../components/RequestForm.jsx";
+import {useUserStore} from "../stores/useUserStore.js";
+import {toast} from "react-hot-toast";
 
 export const XeroxPage = () => {
+  const {user} = useUserStore();
   const { xeroxProfiles, fetchXeroxProfiles } = useXeroxStore();
   const [requestForm, setRequestForm] = useState(false);
   const [requestingProfile, setRequestingProfile] = useState(null);
 
   const handleRequestForm = () => {
-    setRequestForm(!requestForm);
+    if (user && (!user.isLocked)) {
+      setRequestForm(!requestForm);
+    } else {
+      toast.error("Complete Your Pending Request to Make New Requests.");
+    }
   };
   useEffect(() => {
     fetchXeroxProfiles();
@@ -23,7 +30,10 @@ export const XeroxPage = () => {
   return (
     <div className="flex flex-col justify-center py-12 mt-6 sm:px-6 lg:px-8">
       {requestForm ? (
-        <RequestForm handleRequestForm={handleRequestForm} requestingProfile={requestingProfile}/>
+        <RequestForm
+          handleRequestForm={handleRequestForm}
+          requestingProfile={requestingProfile}
+        />
       ) : (
         <>
           <h1 className="text-2xl font-bold mb-4 text-emerald-500">

@@ -4,7 +4,7 @@ import {RequestStatus} from "../components/RequestStatus.jsx";
 
 const HomePage = () => {
 	const { user } = useUserStore();
-  console.log("HomePage user:", !user);
+  // console.log("HomePage user:", !user);
 
 	return (
     <>

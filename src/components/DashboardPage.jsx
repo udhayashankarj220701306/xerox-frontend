@@ -1,6 +1,6 @@
 const DashboardPage = ({ profile }) => {
   
-    console.log("dashboard:", profile);
+    // console.log("dashboard:", profile);
   const { xeroxProfile } = profile;
 
   

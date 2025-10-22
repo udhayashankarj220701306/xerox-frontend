@@ -17,7 +17,7 @@ const createInitialFileState = () => ({
 });
 
 export const RequestForm = ({ handleRequestForm, requestingProfile }) => {
-  const { user } = useUserStore();
+  const { user,lock } = useUserStore();
   const { createRequest, fetchActiveRequests, loading } = useRequestStore();
   const [fileConfig, setFileConfig] = useState([createInitialFileState()]);
   const navigate = useNavigate();
@@ -114,6 +114,7 @@ export const RequestForm = ({ handleRequestForm, requestingProfile }) => {
 
     await createRequest({ requestData: formData });
     fetchActiveRequests({ status: "pending" });
+    await lock({userId:user._id,isLocked:true});
     navigate("/request");
   };
 

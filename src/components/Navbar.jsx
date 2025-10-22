@@ -18,7 +18,7 @@ const Navbar = () => {
   // const isAdmin = user?.role === "admin";
   const [isOpen, setIsOpen] = useState(false);
 
-  console.log("user in navbar:", user);
+  // console.log("user in navbar:", user);
   const handleLinkClick = () => {
     // Closes the mobile menu when a link is clicked
     setIsOpen(false);

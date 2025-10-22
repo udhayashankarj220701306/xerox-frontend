@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import { useState, useEffect } from "react";
 import "./App.css";
+import { Toaster } from "react-hot-toast";
 
 import HomePage from "./pages/HomePage.jsx";
 import RequestPage from "./pages/RequestPage.jsx";
@@ -24,6 +25,9 @@ function App() {
 
   return (
     <div className="bg-black text-white min-h-screen relative overflow-hidden">
+      <div>
+        <Toaster />
+      </div>
       <Navbar className="mb-20" />
       <Routes>
         <Route path="/" element={<HomePage />} />
