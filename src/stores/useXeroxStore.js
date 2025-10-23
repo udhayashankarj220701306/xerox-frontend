@@ -34,4 +34,19 @@ export const useXeroxStore = create((set, get) => ({
       );
     }
   },
+  updateXeroxProfile: async ({id, profileData}) => {  
+    set({ loading: true });
+    try {
+      const res = await axios.patch("/xerox/profile/"+id, profileData);
+      set({ xeroxProfile: res.data, loading: false });
+      toast.success("Xerox profile updated successfully");
+    } catch (error) {
+      set({ loading: false });
+      toast.error(
+        error.response?.data?.message ||
+          "An error occurred while updating xerox profile"
+      );
+      throw error;
+    }
+  },
 }));

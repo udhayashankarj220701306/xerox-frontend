@@ -10,11 +10,7 @@ const HomePage = () => {
     <>
       <div className="flex flex-col justify-center py-12 mt-6 sm:px-6 lg:px-8">
         {(!user)?(<div className="relative min-h-screen bg-gradient-to-br from-blue-100 via-white to-blue-50 text-gray-800 overflow-hidden">
-          {/* Navbar */}
-
-          {/* Add padding-top so content isn’t hidden behind fixed navbar */}
           <div className="pt-24">
-            {/* Header Section */}
             <header className="text-center py-10">
               <h1 className="text-4xl font-bold text-blue-800 drop-shadow-lg">
                 Welcome to Smart Xerox Shop
@@ -24,7 +20,6 @@ const HomePage = () => {
               </p>
             </header>
 
-            {/* Main Cards Section */}
             <main className="flex flex-wrap justify-center gap-8 py-10 px-4">
               {/* Card 1 */}
               <div className="bg-white w-72 p-5 rounded-2xl shadow-xl hover:scale-105 transition-transform duration-300">
