@@ -11,6 +11,7 @@ export const XeroxPage = () => {
   const [requestingProfile, setRequestingProfile] = useState(null);
 
   const handleRequestForm = () => {
+    console.log("handleRequestForm called",user);
     if (user && (!user.isLocked)) {
       setRequestForm(!requestForm);
     } else {
@@ -39,11 +40,11 @@ export const XeroxPage = () => {
           <h1 className="text-2xl font-bold mb-4 text-emerald-500">
             Xerox Profiles
           </h1>
-          <div className="m-2 border-2 border-dashed border-gray-600 rounded-lg p-2 ">
+          <div className=" m-2 border-2 border-dashed  border-gray-600 rounded-lg p-2 ">
             {xeroxProfiles.map((profile) => (
               <div
                 key={profile._id}
-                className="rounded-lg shadow-md p-6"
+                className="m-2 rounded-lg border-1 border-dashed border-emerald-200  shadow-md p-6"
                 onClick={() => {
                   setRequestingProfile(profile);
                   handleRequestForm();

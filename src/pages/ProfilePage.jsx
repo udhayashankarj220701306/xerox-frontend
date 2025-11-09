@@ -1,4 +1,4 @@
-import {useEffect} from 'react'
+import {use, useEffect} from 'react'
 
 import { useUserStore } from '../stores/useUserStore.js';
 
@@ -7,9 +7,15 @@ import DashboardPage from '../components/DashboardPage.jsx';
 export const ProfilePage = () => {
   const {profile,getProfile} = useUserStore();
   useEffect(() => {
-    getProfile();
-    // console.log("profilepage:", profile);
+    const asyncGetProfile = async () => {
+      await getProfile();
+    }
+    asyncGetProfile();
   }, []);
+  useEffect(() => {
+    console.log("profilepage:", profile);
+    // getProfile();
+  }, [profile]);
 
   if (!profile) return <div>Loading...</div>;
   return (

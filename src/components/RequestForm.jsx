@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect,useMemo, useState } from "react";
 import { useRequestStore } from "../stores/useRequestStore.js";
 import { useUserStore } from "../stores/useUserStore.js";
 import { useNavigate } from "react-router-dom";
-
+import { X } from "lucide-react";
 
 // Initial state for a single file configuration
 const createInitialFileState = () => ({
@@ -10,18 +10,19 @@ const createInitialFileState = () => ({
   color: false,
   paper: "A4",
   layout: "potrait",
-  pages: [{ start: "", stop: "" }],
+  pages: [{ start: 1, stop: 1 }],
   binding: false,
   bindingtype: "soft",
   sides: "single",
+  rate: 0,
 });
 
 export const RequestForm = ({ handleRequestForm, requestingProfile }) => {
-  const { user,lock } = useUserStore();
+  const { user, lock } = useUserStore();
   const { createRequest, fetchActiveRequests, loading } = useRequestStore();
   const [fileConfig, setFileConfig] = useState([createInitialFileState()]);
   const navigate = useNavigate();
-
+  console.log("request form profile", requestingProfile);
 
   // Make sure requestingProfile is available and not null
   if (!requestingProfile) {
@@ -31,6 +32,46 @@ export const RequestForm = ({ handleRequestForm, requestingProfile }) => {
       </div>
     );
   }
+  const files = useMemo(() => {
+    console.log("file config", fileConfig);
+    const newFileConfig = [...fileConfig];
+    fileConfig.forEach((fileItem, fileIndex) => {
+      var totalPages = 0;
+      fileItem.pages.forEach((pageRange) => {
+        if (
+          pageRange.start <= pageRange.stop &&
+          pageRange.start > 0 &&
+          pageRange.stop > 0
+        )
+          totalPages += pageRange.stop - pageRange.start + 1;
+      });
+      var rate = 0;
+      rate = requestingProfile.rates[fileItem.paper.toLowerCase()];
+      if (fileItem.color) {
+        rate += requestingProfile.rates["color"];
+      }
+      // if(fileItem.sides === "double"){
+      //   rate =rates*(totalPages/2) *2;
+      // }
+      // else{
+      rate = rate * totalPages;
+      // }
+      console.log("file", fileItem);
+      if (fileItem.binding) {
+        rate += requestingProfile.rates[fileItem.bindingtype];
+      }
+      newFileConfig[fileIndex].rate = rate;
+      console.log(`File ${fileIndex + 1}:`, rate, "pages:", totalPages);
+    });
+    if (JSON.stringify(fileConfig) !== JSON.stringify(newFileConfig)) {
+      console.log("Updating file config with new rates.");
+      setFileConfig(newFileConfig);
+    }
+    return newFileConfig;
+  }, [fileConfig]);
+  const totalRate = useMemo(() => {
+    return files.reduce((acc, file) => acc + file.rate, 0);
+  }, [files]);
 
   // Helper function to check if an option is available
   const isOptionAvailable = (option, optionArray) => {
@@ -86,13 +127,14 @@ export const RequestForm = ({ handleRequestForm, requestingProfile }) => {
     e.preventDefault();
     const formData = new FormData();
     formData.append("userId", user._id);
-    formData.append("xeroxId", requestingProfile.xeroxId._id); 
+    formData.append("xeroxId", requestingProfile.xeroxId._id);
+    formData.append("rate", totalRate);
 
     fileConfig.forEach((fileItem, index) => {
       if (fileItem.file) {
         formData.append(`blobFiles`, fileItem.file);
       }
-      
+
       formData.append(`files[${index}][color]`, fileItem.color);
       formData.append(`files[${index}][paper]`, fileItem.paper);
       formData.append(`files[${index}][layout]`, fileItem.layout);
@@ -114,22 +156,28 @@ export const RequestForm = ({ handleRequestForm, requestingProfile }) => {
 
     await createRequest({ requestData: formData });
     fetchActiveRequests({ status: "pending" });
-    await lock({userId:user._id,isLocked:true});
+    await lock({ userId: user._id, isLocked: true });
     navigate("/request");
   };
 
   return (
     <div className="m-2 p-2 border-2 border-emerald-400 rounded-lg border-dashed">
-      <h2 className="text-xl font-semibold text-center text-emerald-600 mb-4">
-        Add a New Xerox Request
-      </h2>
+      <div className="flex flex-row justify-between items-center">
+        <h2 className="text-xl font-semibold justify-center text-center text-emerald-600 mb-4">
+          Add a New Xerox Request in {requestingProfile.name}
+        </h2>
+        <X className="hover:text-emerald-400" onClick={handleRequestForm} />
+      </div>
       <form onSubmit={handleSubmit} className="space-y-6">
-        {fileConfig.map((fileItem, fileIndex) => (
+        {files.map((fileItem, fileIndex) => (
           <div
             key={fileIndex}
             className="p-4 border border-gray-300 rounded-md"
           >
-            <h3 className="text-lg font-medium mb-2">File {fileIndex + 1}</h3>
+            <div className="flex flex-row justify-between">
+              <h3 className="text-lg font-medium mb-2">File {fileIndex + 1}</h3>
+              <div>Rate: {fileItem.rate}</div>
+            </div>
             {/* ... other file input and page logic ... */}
             <div className="mb-4">
               <label className="block text-gray-700 font-bold mb-2">
@@ -311,6 +359,9 @@ export const RequestForm = ({ handleRequestForm, requestingProfile }) => {
         >
           Add Another File
         </button>
+        <div>
+          Total Rate: {totalRate}
+        </div>
         {/* Submit Button */}
         <button
           type="submit"

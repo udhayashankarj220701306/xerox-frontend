@@ -89,7 +89,7 @@ export const useUserStore = create((set, get) => ({
   lock: async ({ userId, isLocked }) => {
     try {
       const response = await axios.patch("/auth/user/" + userId, { isLocked });
-	  set({user:response.data});
+	  // set({user:response.data});
     } catch (error) {
       toast.error(
         error.response?.data?.message || "An error occurred during logout"

@@ -14,6 +14,10 @@ import Navbar from "./components/Navbar.jsx";
 import LoadingSpinner from "./components/LoadingSpinner.jsx";
 
 import { useUserStore } from "./stores/useUserStore.js";
+import { TermsAndCondition } from "./pages/TermsAndCondition.jsx";
+import { PrivacyPolicy } from "./pages/PrivacyPolicy.jsx";
+import { RefundPolicy } from "./pages/RefundPolicy.jsx";
+import Footer from "./components/Footer.jsx";
 
 function App() {
   const { user, checkAuth, checkingAuth } = useUserStore();
@@ -29,7 +33,7 @@ function App() {
         <Toaster />
       </div>
       <Navbar className="mb-20" />
-      <Routes>
+      <Routes className="py-12 mt-6 sm:px-6 lg:px-8 min-h-1vh">
         <Route path="/" element={<HomePage />} />
         <Route
           path="/signup"
@@ -52,7 +56,11 @@ function App() {
           path="/xerox"
           element={user ? <XeroxPage /> : <Navigate to="/login" />}
         />
+        <Route path="/termsandcondition" element={<TermsAndCondition />} />
+        <Route path="/privacypolicy" element={<PrivacyPolicy />} />
+        <Route path="/refundpolicy" element={<RefundPolicy />} />
       </Routes>
+      <Footer />
     </div>
   );
 }

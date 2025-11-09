@@ -69,6 +69,7 @@ export const RequestDisplay = ({ requestPara }) => {
 }
       </div>
       <div>Created At: {new Date(request.createdAt).toLocaleString()}</div>
+      <div>Total Rate: {request.rate} Rs</div>
       <div>Files:</div>
       {request.files.map((file) => (
         <div
