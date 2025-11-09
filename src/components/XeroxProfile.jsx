@@ -69,7 +69,9 @@ export const XeroxProfile = ({ xeroxProfile }) => {
         temp.push(...xeroxProfile[key].map((item) => item.toLowerCase()));
       }
     }
-    setCurrentSelectedOptions(temp.filter((item) => item !== "bw"));
+    setCurrentSelectedOptions(
+      temp.filter((item) => allRateKeys.includes(item))
+    );
     console.log("dashboard xeroxProfile:", xeroxProfile);
     console.log("temp:", temp);
   }, [xeroxProfile]);
@@ -84,7 +86,7 @@ export const XeroxProfile = ({ xeroxProfile }) => {
     );
 
     const finalProfileData = { ...profileData, rates };
-    console.log("Final profile data to save:", finalProfileData,profileData);
+    console.log("Final profile data to save:", finalProfileData, profileData);
     await updateXeroxProfile({ id, profileData: profileData });
     console.log("Saving final data:", finalProfileData);
   };
@@ -118,7 +120,7 @@ export const XeroxProfile = ({ xeroxProfile }) => {
       newOptions = [...currentOptions, value];
       if (fieldKey != "layoutOption") {
         temp = [...currentSelectedOptions, value];
-        temp=temp.filter((item) => item !== "bw");
+        temp = temp.filter((item) => allRateKeys.includes(item));
       }
     }
 
@@ -151,12 +153,12 @@ export const XeroxProfile = ({ xeroxProfile }) => {
   if (!xeroxProfile) return <p>No Xerox Profile available.</p>;
 
   // Define all rate keys for rendering
-  const allRateKeys = ["bw", "color", "a4", "a3", "a5", "spiral", "soft"];
+  const allRateKeys = [ "color", "a4", "a3", "a5", "spiral", "soft"];
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-gray-700 rounded-lg p-6 max-w-lg mx-auto"
+      className="bg-gray-700 rounded-lg p-6  mx-auto"
     >
       <h2 className="text-2xl font-bold text-white mb-6">Edit Profile</h2>
 
@@ -175,64 +177,69 @@ export const XeroxProfile = ({ xeroxProfile }) => {
       </div>
 
       {/* --- Rate Inputs (NEW SECTION) --- */}
-      <fieldset className="mb-6 border border-gray-600 p-4 rounded-lg">
-        <legend className="font-medium text-white mb-4 text-lg">
-          Set Rates (Per Unit)
-        </legend>
-        <div className="grid grid-cols-2 gap-4">
-          {currentSelectedOptions.map((key) => (
-            // Fallback to 0 if formData.rates is undefined or key is missing
-            <RateInputGroup
-              key={key}
-              label={key.toUpperCase()}
-              rateKey={key}
-              value={formData.rates ? formData.rates[key] : 0}
-              onChange={handleRateChange}
-            />
-          ))}
+      <div className="flex flex-row">
+        <div>
+          <fieldset className="mb-6 border border-gray-600 p-4 rounded-lg">
+            <legend className="font-medium text-white mb-4 text-lg">
+              Set Rates (Per Unit)
+            </legend>
+            <div className="grid grid-cols-2 gap-4">
+              {currentSelectedOptions.map((key) => (
+                // Fallback to 0 if formData.rates is undefined or key is missing
+                <RateInputGroup
+                  key={key}
+                  label={key.toUpperCase()}
+                  rateKey={key}
+                  value={formData.rates ? formData.rates[key] : 0}
+                  onChange={handleRateChange}
+                />
+              ))}
+            </div>
+          </fieldset>
         </div>
-      </fieldset>
+        {/* --- Checkbox Groups --- */}
+        <div>
+          <CheckboxGroup
+            label="Color Options"
+            fieldKey="colorOption"
+            allOptions={allOptions.colorOption}
+            selectedOptions={formData.colorOption || []} // Added fallback array
+            onChange={handleCheckboxChange}
+          />
+          {/* ... (Other Checkbox Groups) ... */}
+          <CheckboxGroup
+            label="Paper Options"
+            fieldKey="paperOption"
+            allOptions={allOptions.paperOption}
+            selectedOptions={formData.paperOption || []}
+            onChange={handleCheckboxChange}
+          />
 
-      {/* --- Checkbox Groups --- */}
-      <CheckboxGroup
-        label="Color Options"
-        fieldKey="colorOption"
-        allOptions={allOptions.colorOption}
-        selectedOptions={formData.colorOption || []} // Added fallback array
-        onChange={handleCheckboxChange}
-      />
-      {/* ... (Other Checkbox Groups) ... */}
-      <CheckboxGroup
-        label="Paper Options"
-        fieldKey="paperOption"
-        allOptions={allOptions.paperOption}
-        selectedOptions={formData.paperOption || []}
-        onChange={handleCheckboxChange}
-      />
+          <CheckboxGroup
+            label="Layout Options"
+            fieldKey="layoutOption"
+            allOptions={allOptions.layoutOption}
+            selectedOptions={formData.layoutOption || []}
+            onChange={handleCheckboxChange}
+          />
 
-      <CheckboxGroup
-        label="Layout Options"
-        fieldKey="layoutOption"
-        allOptions={allOptions.layoutOption}
-        selectedOptions={formData.layoutOption || []}
-        onChange={handleCheckboxChange}
-      />
+          <CheckboxGroup
+            label="Sides Options"
+            fieldKey="sidesOption"
+            allOptions={allOptions.sidesOption}
+            selectedOptions={formData.sidesOption || []}
+            onChange={handleCheckboxChange}
+          />
 
-      <CheckboxGroup
-        label="Sides Options"
-        fieldKey="sidesOption"
-        allOptions={allOptions.sidesOption}
-        selectedOptions={formData.sidesOption || []}
-        onChange={handleCheckboxChange}
-      />
-
-      <CheckboxGroup
-        label="Binding Options"
-        fieldKey="bindingOption"
-        allOptions={allOptions.bindingOption}
-        selectedOptions={formData.bindingOption || []}
-        onChange={handleCheckboxChange}
-      />
+          <CheckboxGroup
+            label="Binding Options"
+            fieldKey="bindingOption"
+            allOptions={allOptions.bindingOption}
+            selectedOptions={formData.bindingOption || []}
+            onChange={handleCheckboxChange}
+          />
+        </div>
+      </div>
 
       {/* --- Save Button --- */}
       <div className="mt-6">
