@@ -207,7 +207,9 @@ export const RequestForm = ({ handleRequestForm, requestingProfile }) => {
                     onChange={(e) => handleInputChange(e, fileIndex)}
                     className="form-checkbox h-5 w-5 text-emerald-600"
                   />
-                  <span>Color Print</span>
+                  <span>
+                    Color Print -: {requestingProfile.rates["color"]} Rs
+                  </span>
                 </label>
               )}
               {/* Conditional rendering for paper option */}
@@ -222,7 +224,8 @@ export const RequestForm = ({ handleRequestForm, requestingProfile }) => {
                   >
                     {requestingProfile.paperOption.map((option) => (
                       <option key={option} value={option}>
-                        {option}
+                        {option} :-{" "}
+                        {requestingProfile.rates[option.toLowerCase()]} Rs
                       </option>
                     ))}
                   </select>
@@ -316,7 +319,8 @@ export const RequestForm = ({ handleRequestForm, requestingProfile }) => {
                     >
                       {requestingProfile.bindingOption.map((option) => (
                         <option key={option} value={option}>
-                          {option}
+                          {option} :-{" "}
+                          {requestingProfile.rates[option]} Rs
                         </option>
                       ))}
                     </select>
@@ -359,9 +363,7 @@ export const RequestForm = ({ handleRequestForm, requestingProfile }) => {
         >
           Add Another File
         </button>
-        <div>
-          Total Rate: {totalRate}
-        </div>
+        <div>Total Rate: {totalRate}</div>
         {/* Submit Button */}
         <button
           type="submit"
