@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { useXeroxStore } from "../stores/useXeroxStore";
 
 // --- NEW COMPONENT FOR RATE INPUTS ---
-const RateInputGroup = ({ label, rateKey, value, onChange }) => (
-  <div className="mb-3">
+const RateInputGroup = ({ label, rateKey, value, onChange, abled }) => (
+  <div className={`mb-3 ${abled ? 'bg-green-600' : 'bg-red-600'} rounded`}>
     <label
       htmlFor={rateKey}
       className="block font-medium text-white mb-1 capitalize"
@@ -16,6 +16,7 @@ const RateInputGroup = ({ label, rateKey, value, onChange }) => (
       // Ensure value is treated as a string for input field
       value={value !== undefined ? value : ""}
       onChange={(e) => onChange(rateKey, e.target.value)}
+      disabled={!abled}
       className="w-full p-2 rounded bg-gray-800 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
       min="0"
       step="0.01" // Allow for decimal rates
@@ -60,18 +61,53 @@ export const XeroxProfile = ({ xeroxProfile }) => {
   const [currentSelectedOptions, setCurrentSelectedOptions] = useState([]);
 
   // Ensure formData initializes correctly, especially when xeroxProfile is fetched asynchronously
+  const allRateKeys = ["color", "a4", "a3", "a5", "spiral", "soft"];
+  const allRateObjects = [
+    {
+      item: "a3",
+      abled: false,
+    },
+    {
+      item: "a4",
+      abled: false,
+    },
+    {
+      item: "a5",
+      abled: false,
+    },
+    {
+      item: "color",
+      abled: false,
+    },
+    {
+      item: "soft",
+      abled: false,
+    },
+    {
+      item: "spiral",
+      abled: false,
+    },
+  ];
   useEffect(() => {
     setFormData(xeroxProfile);
-    const temp = [];
+    let temp = [];
+    // let map = new Map();
     for (const key in xeroxProfile) {
       console.log("key:", key);
       if (key != "layoutOption" && Array.isArray(xeroxProfile[key])) {
         temp.push(...xeroxProfile[key].map((item) => item.toLowerCase()));
       }
     }
-    setCurrentSelectedOptions(
-      temp.filter((item) => allRateKeys.includes(item))
-    );
+    temp = temp.filter((item) => allRateKeys.includes(item.toLowerCase()));
+    // temp
+    // temp.sort();
+    // temp=temp.map((item)=> {return {item:item,abled:false}});
+    temp = allRateObjects.map((item) => {
+      let abled = false;
+      if (temp.includes(item.item)) abled = true;
+      return { item: item.item, abled: abled };
+    });
+    setCurrentSelectedOptions(temp);
     console.log("dashboard xeroxProfile:", xeroxProfile);
     console.log("temp:", temp);
   }, [xeroxProfile]);
@@ -93,7 +129,7 @@ export const XeroxProfile = ({ xeroxProfile }) => {
 
   const allOptions = {
     colorOption: ["bw", "color"],
-    paperOption: ["A4", "A3", "A5"],
+    paperOption: ["A3", "A4", "A5"],
     layoutOption: ["potrait", "landscape"],
     sidesOption: ["single", "double"],
     bindingOption: ["soft", "spiral"],
@@ -110,19 +146,36 @@ export const XeroxProfile = ({ xeroxProfile }) => {
     const currentOptions = formData[fieldKey] || [];
     const isChecked = currentOptions.includes(value);
     let newOptions;
-    let temp;
+    let temp = currentSelectedOptions;
+    let map = new Map();
     if (isChecked) {
       newOptions = currentOptions.filter((item) => item !== value);
-      if (fieldKey != "layoutOption") {
-        temp = currentSelectedOptions.filter((item) => item !== value);
-      }
+      // if (fieldKey != "layoutOption") {
+      console.log(value);
+      // temp = currentSelectedOptions.filter(
+      //   (item) => item.item !== value.toLowerCase()
+      // );
+      temp = temp.map((item) => {
+        let abled = item.abled;
+        if (item.item === value.toLowerCase()) abled = false;
+        return { item: item.item, abled: abled };
+      });
+      // }
     } else {
       newOptions = [...currentOptions, value];
-      if (fieldKey != "layoutOption") {
-        temp = [...currentSelectedOptions, value];
-        temp = temp.filter((item) => allRateKeys.includes(item));
-      }
+      // if (fieldKey != "layoutOption") {
+      // temp = [...currentSelectedOptions, {item:value,able}];
+      temp = temp.map((item) => {
+        let abled = item.abled;
+        if (item.item === value.toLowerCase()) abled = true;
+        return { item: item.item, abled: abled };
+      });
+      //   // temp = temp.filter((item) => allRateKeys.includes(item.toLowerCase()));
+      //   // console
+      // }
     }
+    // temp = temp.filter((item) => allRateKeys.includes(item.toLowerCase()));
+    // temp.sort();
 
     setFormData((prev) => ({
       ...prev,
@@ -153,7 +206,6 @@ export const XeroxProfile = ({ xeroxProfile }) => {
   if (!xeroxProfile) return <p>No Xerox Profile available.</p>;
 
   // Define all rate keys for rendering
-  const allRateKeys = [ "color", "a4", "a3", "a5", "spiral", "soft"];
 
   return (
     <form
@@ -177,7 +229,7 @@ export const XeroxProfile = ({ xeroxProfile }) => {
       </div>
 
       {/* --- Rate Inputs (NEW SECTION) --- */}
-      <div className="flex flex-row">
+      <div className="flex flex-row justify-around">
         <div>
           <fieldset className="mb-6 border border-gray-600 p-4 rounded-lg">
             <legend className="font-medium text-white mb-4 text-lg">
@@ -187,10 +239,11 @@ export const XeroxProfile = ({ xeroxProfile }) => {
               {currentSelectedOptions.map((key) => (
                 // Fallback to 0 if formData.rates is undefined or key is missing
                 <RateInputGroup
-                  key={key}
-                  label={key.toUpperCase()}
-                  rateKey={key}
-                  value={formData.rates ? formData.rates[key] : 0}
+                  key={key.item}
+                  label={key.item.toUpperCase()}
+                  rateKey={key.item}
+                  value={formData.rates ? formData.rates[key.item] : 0}
+                  abled={key.abled}
                   onChange={handleRateChange}
                 />
               ))}
@@ -199,45 +252,52 @@ export const XeroxProfile = ({ xeroxProfile }) => {
         </div>
         {/* --- Checkbox Groups --- */}
         <div>
-          <CheckboxGroup
-            label="Color Options"
-            fieldKey="colorOption"
-            allOptions={allOptions.colorOption}
-            selectedOptions={formData.colorOption || []} // Added fallback array
-            onChange={handleCheckboxChange}
-          />
-          {/* ... (Other Checkbox Groups) ... */}
-          <CheckboxGroup
-            label="Paper Options"
-            fieldKey="paperOption"
-            allOptions={allOptions.paperOption}
-            selectedOptions={formData.paperOption || []}
-            onChange={handleCheckboxChange}
-          />
+          <fieldset className="mb-6 border border-gray-600 p-4 rounded-lg">
+            <legend className="font-medium text-white mb-4 text-lg">
+              Options
+            </legend>
+            <div className="grid grid-cols-2 gap-4">
+              <CheckboxGroup
+                label="Color Options"
+                fieldKey="colorOption"
+                allOptions={allOptions.colorOption}
+                selectedOptions={formData.colorOption || []} // Added fallback array
+                onChange={handleCheckboxChange}
+              />
+              {/* ... (Other Checkbox Groups) ... */}
+              <CheckboxGroup
+                label="Paper Options"
+                fieldKey="paperOption"
+                allOptions={allOptions.paperOption}
+                selectedOptions={formData.paperOption || []}
+                onChange={handleCheckboxChange}
+              />
 
-          <CheckboxGroup
-            label="Layout Options"
-            fieldKey="layoutOption"
-            allOptions={allOptions.layoutOption}
-            selectedOptions={formData.layoutOption || []}
-            onChange={handleCheckboxChange}
-          />
+              <CheckboxGroup
+                label="Layout Options"
+                fieldKey="layoutOption"
+                allOptions={allOptions.layoutOption}
+                selectedOptions={formData.layoutOption || []}
+                onChange={handleCheckboxChange}
+              />
 
-          <CheckboxGroup
-            label="Sides Options"
-            fieldKey="sidesOption"
-            allOptions={allOptions.sidesOption}
-            selectedOptions={formData.sidesOption || []}
-            onChange={handleCheckboxChange}
-          />
+              <CheckboxGroup
+                label="Sides Options"
+                fieldKey="sidesOption"
+                allOptions={allOptions.sidesOption}
+                selectedOptions={formData.sidesOption || []}
+                onChange={handleCheckboxChange}
+              />
 
-          <CheckboxGroup
-            label="Binding Options"
-            fieldKey="bindingOption"
-            allOptions={allOptions.bindingOption}
-            selectedOptions={formData.bindingOption || []}
-            onChange={handleCheckboxChange}
-          />
+              <CheckboxGroup
+                label="Binding Options"
+                fieldKey="bindingOption"
+                allOptions={allOptions.bindingOption}
+                selectedOptions={formData.bindingOption || []}
+                onChange={handleCheckboxChange}
+              />
+            </div>
+          </fieldset>
         </div>
       </div>
 
