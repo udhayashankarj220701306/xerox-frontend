@@ -19,5 +19,7 @@ jobs:
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
     - run: |
-        docker build . -t xerox.azurecr.io/myappfrontend:${{ github.sha }} 
+        docker build . \
+          --build-arg VITE_BASE_URL_SERVER=${{ secrets.VITE_AZURE_BACKEND_URL }} \
+          -t xerox.azurecr.io/myappfrontend:${{ github.sha }} 
         docker push xerox.azurecr.io/myappfrontend:${{ github.sha }}
