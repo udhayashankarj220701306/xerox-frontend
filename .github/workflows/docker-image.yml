@@ -9,17 +9,32 @@ on:
 jobs:
 
   build:
-
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: azure/docker-login@v2
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: 'Login via Azure CLI'
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Log in to Azure Container Registry
+      uses: azure/docker-login@v2
       with:
         login-server: xerox.azurecr.io
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
-    - run: |
+
+    - name: Build and Push Docker Image
+      run: |
         docker build . \
           --build-arg VITE_BASE_URL_SERVER=${{ secrets.VITE_AZURE_BACKEND_URL }} \
           -t xerox.azurecr.io/myappfrontend:${{ github.sha }} 
         docker push xerox.azurecr.io/myappfrontend:${{ github.sha }}
+
+    - name: Deploy to Azure Web App
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: xerox-frontend
+        images: xerox.azurecr.io/myappfrontend:${{ github.sha }}
