@@ -7,8 +7,8 @@ COPY package*.json ./
 RUN npm install
 COPY . .
 ARG VITE_BASE_URL_SERVER
-ENV VITE_BASE_URL_SERVER=$VITE_BASE_URL_SERVER
-RUN npm run build
+# ENV VITE_BASE_URL_SERVER=$VITE_BASE_URL_SERVER
+RUN VITE_BASE_URL_SERVER=$VITE_BASE_URL_SERVER npm run build
  
 # Production Stage
 FROM nginx:stable-alpine AS production
