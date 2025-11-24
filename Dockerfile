@@ -7,6 +7,7 @@ COPY package*.json ./
 RUN npm install
 COPY . .
 ARG VITE_BASE_URL_SERVER
+ENV VITE_BASE_URL_SERVER=$VITE_BASE_URL_SERVER
 RUN npm run build
  
 # Production Stage
